@@ -29,8 +29,8 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 // Pin connected to the water level sensor
-const int waterLevelSensorPin = D2;  // Change this to the actual pin you've connected the sensor to
-
+  // Change this to the actual pin you've connected the sensor to
+const int waterLevelSensorPin =0;
 unsigned long sendDataPrevMillis = 0;
 unsigned long count = 0;
 int h;
@@ -38,6 +38,7 @@ int h;
 void setup() {
   Serial.begin(115200);
 
+pinMode(waterLevelSensorPin, INPUT);
   // Connect to WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
@@ -65,21 +66,23 @@ void setup() {
 }
 
 void loop() {
-  while (Serial.available()) {
-    h = Serial.read();
-  }
-
-  // Read water level from the sensor
-  int waterLevel = digitalRead(waterLevelSensorPin);
-
-  // Prepare Firebase JSON data
-  FirebaseJson json1;
+   int sensorValue = analogRead(0);
+  if (sensorValue > 570)  {
+    int outputValue = map(sensorValue, 570, 800, 0, 255);
+    FirebaseJson json1;
   json1.set("1/Status", F("1"));
   json1.set("1/OilLevel", F("taken"));
-  json1.set("1/WaterLevel",1);
+  json1.set("1/WaterLevel",outputValue);
 
   // Send data to Firebase
   Serial.printf("Set json... %s\n", Firebase.set(fbdo, F("/OilLevels"), json1) ? "ok" : fbdo.errorReason().c_str());
+    Serial.println(outputValue); // generate PWM signal
+  }
+  // Read water level from the sensor
+  int waterLevel = digitalRead(waterLevelSensorPin);
+  Serial.write(waterLevel);
+  // Prepare Firebase JSON data
+  
 
   delay(1000);
 }
