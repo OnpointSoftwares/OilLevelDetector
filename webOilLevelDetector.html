@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Web Page</title>
+  <!-- Use Firebase JavaScript SDK version 8.x -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+</head>
+<body>
+    <h1>Firebase Web Page</h1>
+    <div id="data-container"></div>
+
+    <!-- Initialize Firebase and include your Firebase configuration -->
+    <script type="module">
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhODCfRKvVbYeHQOruplcmfY0_f_PNaoc",
+            authDomain: "oilleveldetector.firebaseapp.com",
+            projectId: "oilleveldetector",
+            storageBucket: "oilleveldetector.appspot.com",
+            messagingSenderId: "320154127664",
+            appId: "1:320154127664:web:65b9de1881ee88b1e9ccf5"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);  // Change here
+
+        // Reference to your Firebase database
+        var database = firebase.database();
+        
+        // Function to fetch data from Firebase
+        function fetchData() {
+            var dataContainer = document.getElementById('data-container');
+
+            // Reference to the desired data node in your database
+            var dataRef = database.ref('OilLevels');
+
+            // Fetch data once
+            dataRef.once('value')
+                .then(function(snapshot) {
+                    var data = snapshot.child("1").val();
+                    // Update the HTML content with the fetched data
+                    dataContainer.innerHTML = JSON.stringify(data['WaterLevel'], null, 2);
+                })
+                .catch(function(error) {
+                    console.error("Error fetching data: ", error);
+                });
+        }
+
+        // Call the fetchData function when the page loads
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
